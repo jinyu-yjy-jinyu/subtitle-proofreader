@@ -27,6 +27,7 @@
           <span id="cps-value" class="cps-value">5.0</span>
         </label>
         <button id="btn-follow" class="btn btn-toggle is-on">跟随中</button>
+        <button id="btn-settings" class="btn btn-icon" title="设置高亮样式">⚙</button>
       </div>
     </header>
 
@@ -39,8 +40,8 @@
 
     <main class="layout">
       <section class="pane pane-video">
-        <div id="video-wrap" class="video-wrap">
-          <video id="player" preload="metadata" playsinline></video>
+        <div class="video-wrap">
+          <video id="player" class="hidden" preload="metadata" playsinline></video>
           <div id="video-empty" class="video-empty">
             <div class="ve-icon">🎬</div>
             <p>尚未打开视频</p>

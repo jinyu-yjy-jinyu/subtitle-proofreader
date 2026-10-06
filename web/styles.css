@@ -11,6 +11,13 @@
   --error: #ef5f5f;
   --ok: #3fbf7f;
   --row-h: 56px;
+
+  /* 高亮样式：由 ui/settings.js 覆盖并持久化到 localStorage */
+  --hl-bg: rgba(79, 140, 255, 0.16);
+  --hl-border: #4f8cff;
+  --hl-font-size: 14px;
+  --hl-font-weight: normal;
+  --hl-text-color: var(--text);
 }
 
 * {
@@ -416,8 +423,16 @@ body {
 }
 
 .cue-row.is-active {
-  background: var(--accent-soft);
-  border-left-color: var(--accent);
+  background: var(--hl-bg);
+  border-left-color: var(--hl-border);
+}
+
+/* 高亮行的字号、字重与文字颜色可在「设置」中调整 */
+.cue-row.is-active .cue-text {
+  font-size: var(--hl-font-size);
+  font-weight: var(--hl-font-weight);
+  line-height: 1.5;
+  color: var(--hl-text-color);
 }
 
 .cue-row.is-dirty .cue-text {
@@ -568,8 +583,8 @@ body {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 20px;
-  min-width: 420px;
-  max-width: 620px;
+  min-width: 460px;
+  max-width: 640px;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
 }
 
@@ -651,6 +666,284 @@ body {
   grid-template-columns: auto 1fr;
   gap: 6px 14px;
   font-size: 12px;
+}
+
+/* ============================================================
+   设置面板：高亮样式
+   ============================================================ */
+
+.set-group {
+  padding: 12px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.set-group-title {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.set-row:last-child {
+  margin-bottom: 0;
+}
+
+/* 色轮 + 右侧控件 */
+.set-row-wheel {
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* ---------------- 色轮 ---------------- */
+
+.wheel-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 0 0 auto;
+  transition: opacity 0.15s;
+}
+
+/* 文字色被关闭时变灰 */
+.wheel-stage.is-off {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.wheel-canvas {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  cursor: crosshair;
+  /* 圆盘外围的透明区域不该捕获点击 */
+  background-size: contain;
+  touch-action: none;
+}
+
+/* 当前选色的指示圈 */
+.wheel-marker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55), 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  /* 初始位置由 JS 设置 */
+  left: 84px;
+  top: 84px;
+}
+
+.wheel-strip {
+  width: 22px;
+  height: 168px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  cursor: ns-resize;
+  touch-action: none;
+  flex: 0 0 auto;
+}
+
+.wheel-strip-marker {
+  position: absolute;
+  /* 与 .wheel-strip 的位置对齐：圆盘宽 168 + 间距 10 */
+  left: 178px;
+  width: 22px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  background: transparent;
+}
+
+/* 文字色复选框 */
+.set-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.set-check {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* 色轮右侧的控件列：纵向排列 */
+.set-side {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.set-side .set-row {
+  margin-bottom: 0;
+}
+
+.set-label-inline {
+  flex: 0 0 40px;
+  margin-bottom: 0;
+}
+
+/* 原生取色器：给足点击面积 */
+.set-picker {
+  width: 46px;
+  height: 32px;
+  padding: 2px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.set-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.set-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.set-picker::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+.set-hex {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font: 13px/1.2 Consolas, Monaco, monospace;
+}
+
+.set-hex:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 预设色板 */
+.set-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.set-chip {
+  width: 30px;
+  height: 30px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+.set-chip:hover {
+  transform: scale(1.12);
+  border-color: #fff;
+}
+
+/* 字段：标签在上，控件在下 */
+.set-field {
+  margin-bottom: 12px;
+}
+
+.set-field:last-child {
+  margin-bottom: 0;
+}
+
+.set-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+}
+
+/* 滑块行：标签 - 滑块 - 数值 同一行 */
+.set-field-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.set-field-inline .set-label {
+  flex: 0 0 64px;
+  margin-bottom: 0;
+}
+
+.set-range {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--accent);
+}
+
+.set-value {
+  flex: 0 0 42px;
+  text-align: right;
+  font-size: 12px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.set-select {
+  width: 100%;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.set-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 预览区：复用真实行的样式，所见即所得 */
+.set-preview {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.set-preview .cue-row {
+  border-left: 3px solid transparent;
+}
+
+.set-preview .cue-text {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .kbd-list kbd {

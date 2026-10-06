@@ -14,6 +14,7 @@ import { toSrt, toPlainText, detectEol } from './core/srt-writer.js';
 import { CueList } from './ui/cue-list.js';
 import { PlayerController } from './ui/player-web.js';
 import { toast, showModal, confirmDialog, showIssues } from './ui/toast-web.js';
+import { loadSettings, applySettings, openSettings } from './ui/settings.js';
 
 const state = {
   fileName: null,
@@ -25,6 +26,7 @@ const state = {
   cps: 5,
   videoDuration: 0,
   unsaved: false,
+  settings: null,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -72,6 +74,10 @@ const cueList = new CueList(els.cueList, {
 init();
 
 function init() {
+  // 先套用已保存的高亮样式，避免刷新后闪烁回默认值
+  state.settings = loadSettings();
+  applySettings(state.settings);
+
   bindToolbar();
   bindKeys();
   bindSplitter();
@@ -84,6 +90,22 @@ function init() {
     }
     return undefined;
   });
+}
+
+/* ---------------- 设置 ---------------- */
+async function openSettingsPanel() {
+  const result = await openSettings(state.settings, (s) => {
+    // 面板内实时预览：直接反映到已打开的列表
+    state.settings = s;
+  });
+
+  if (result) {
+    state.settings = result;
+    toast('设置已保存', '高亮样式已更新', 'ok', 1800);
+  } else {
+    // 取消时回滚到打开面板前的值
+    applySettings(state.settings);
+  }
 }
 
 /* ---------------- 打开字幕 ---------------- */
@@ -308,6 +330,8 @@ function bindToolbar() {
     if (cueList.follow) cueList.pauseFollow();
     else cueList.resumeFollow();
   });
+
+  on('btn-settings', 'click', openSettingsPanel);
 
   on('btn-play', 'click', () => player.toggle());
   on('btn-prev-cue', 'click', () => jumpCue(-1));

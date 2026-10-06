@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output (no bundler in this project, kept for safety)
+dist/
+release/
+src-tauri/target/
+
+# caches & logs
+*.log
+proxy/
+.cache/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Thumbs.db:*
+desktop.ini
+
+# local scratch
+tmp-*/
+*.tmp
+*.bak
+probe-out.txt
+*.out

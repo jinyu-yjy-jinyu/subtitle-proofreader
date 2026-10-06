@@ -1,0 +1,28 @@
+{
+  "name": "subtitle-proofreader",
+  "version": "1.0.0",
+  "description": "字幕校对工具：左侧视频、右侧字幕文本，按视频秒数高亮对应文字。浏览器版，零安装。",
+  "type": "commonjs",
+  "scripts": {
+    "web": "node scripts/serve-web.js",
+    "start": "node scripts/serve-web.js",
+    "test": "node --test test/*.test.js",
+    "test:web": "node scripts/check-web.js",
+    "test:files": "node scripts/check-file-service.js",
+    "test:media": "node scripts/check-media-service.js",
+    "test:all": "node --test test/*.test.js && node scripts/check-file-service.js && node scripts/check-media-service.js"
+  },
+  "keywords": [
+    "subtitle",
+    "srt",
+    "proofread",
+    "srt-editor",
+    "video-subtitle"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}

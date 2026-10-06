@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>字幕校对（浏览器版）</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="tb-group">
+        <button id="btn-open-video" class="btn">打开视频</button>
+        <button id="btn-open-sub" class="btn">打开字幕</button>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-group">
+        <button id="btn-download" class="btn" title="下载修改后的字幕">下载字幕</button>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-group tb-grow">
+        <span id="file-name" class="file-name">未打开文件</span>
+        <span id="dirty-dot" class="dirty-dot" title="有未保存的修改" hidden>●</span>
+      </div>
+      <div class="tb-group">
+        <label id="cps-wrap" class="cps" hidden title="纯文本按字数估算时间轴">
+          <span>每秒字数</span>
+          <input id="cps-slider" type="range" min="2" max="10" step="0.5" value="5" />
+          <span id="cps-value" class="cps-value">5.0</span>
+        </label>
+        <button id="btn-follow" class="btn btn-toggle is-on">跟随中</button>
+      </div>
+    </header>
+
+    <div class="status-bar">
+      <span id="status-summary" class="status-summary"></span>
+      <button id="btn-issues" class="status-link" hidden></button>
+      <span id="status-estimate" class="badge badge-warn" hidden>时间轴为字数估算</span>
+      <span id="status-time" class="status-time">--:-- / --:--</span>
+    </div>
+
+    <main class="layout">
+      <section class="pane pane-video">
+        <div id="video-wrap" class="video-wrap">
+          <video id="player" preload="metadata" playsinline></video>
+          <div id="video-empty" class="video-empty">
+            <div class="ve-icon">🎬</div>
+            <p>尚未打开视频</p>
+            <button class="btn btn-primary" id="btn-open-video-2">选择视频文件</button>
+            <p class="ve-hint">
+              浏览器版仅支持 mp4 / webm 等原生格式；<br />
+              mkv / avi / mov 请先用 ffmpeg 转成 mp4
+            </p>
+          </div>
+        </div>
+        <div class="video-controls">
+          <button id="btn-play" class="btn btn-icon" title="播放/暂停 (空格)">▶</button>
+          <button id="btn-prev-cue" class="btn btn-icon" title="上一句">⏮</button>
+          <button id="btn-next-cue" class="btn btn-icon" title="下一句">⏭</button>
+          <span id="time-label" class="time-label">00:00 / 00:00</span>
+          <input id="seek" class="seek" type="range" min="0" max="1000" value="0" step="1" />
+          <select id="speed" class="speed">
+            <option value="0.5">0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="splitter" id="splitter"></div>
+
+      <section class="pane pane-text">
+        <div id="cue-list" class="cue-list" tabindex="0">
+          <div id="cue-empty" class="cue-empty">
+            <p>尚未打开字幕</p>
+            <button class="btn btn-primary" id="btn-open-sub-2">选择字幕文件</button>
+            <p class="ce-hint">支持 .srt / .ass / .txt，打开时先校验格式，再按视频秒数高亮</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast-host" class="toast-host"></div>
+
+    <dialog id="modal" class="modal">
+      <h3 id="modal-title" class="modal-title"></h3>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </dialog>
+
+    <script type="module" src="./app-web.js"></script>
+  </body>
+</html>
